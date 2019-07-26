@@ -17,7 +17,7 @@ class CPU:
         self.reg[7] = 0xf4
         self.start = self.reg[7]
         #flag for conditionals
-        self.flag = 0
+        self.flag = 0b0000000
         #opcodes
         self.cpu_run = True
         self.h = 0b00000001 
@@ -89,7 +89,7 @@ class CPU:
         pass
     
     def cpu_jmp(self):
-        pass
+        self.pc = self.ram_read(self.pc + 1)
     
     def cpu_jeq(self):
         pass
@@ -169,6 +169,11 @@ class CPU:
         CALL = 0b01010000
         RET = 0b00010001
         ADD = 0b10100000
+        CMP = 0b10100111
+        JMP = 0b01010100
+        JEQ = 0b01010101
+        JNE = 0b01010110
+
         
         # self.trace()
         run_cpu = True
@@ -202,6 +207,14 @@ class CPU:
                 self.cpu_call()
             elif self.ram[self.ir] == RET:
                 self.cpu_ret()
+            elif self.ram[self.ir] == CMP:
+                self.cpu_cmd()
+            elif self.ram[self.ir] == JMP:
+                self.cpu_jmp()
+            elif self.ram[self.ir] == JEQ:
+                self.cpu_jeq()
+            elif self.ram[self.ir] == JNE:
+                self.cpu_jne()
                 
 
 
