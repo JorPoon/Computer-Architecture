@@ -39,10 +39,7 @@ class CPU:
         self.op_table[self.prn] = self.cpu_prn
         self.op_table[self.mul] = self.cpu_mul
         self.op_table[self.push] = self.cpu_push
-
-
-        
-        
+ 
     def cpu_halt(self):
         self.cpu_run = False
         sys.exit(1)  
@@ -97,25 +94,6 @@ class CPU:
     def load(self):
         """Load a program into memory."""
 
-        # address = 0
-
-        # # For now, we've just hardcoded a program:
-
-        # program = [
-        #     # From print8.ls8
-        #     0b10000010, # LDI R0,8
-        #     0b00000000,
-        #     0b00001000,
-        #     0b01000111, # PRN R0
-        #     0b00000000,
-        #     0b00000001, # HLT
-        # ]
-
-        # for instruction in program:
-        #     self.ram[address] = instruction
-        #     address += 1
-        # print(sys.argv[0])
-        # print(sys.argv[1])
         if len(sys.argv) != 2:
             print(f"usage: {sys.argv[0]} filename")
             sys.exit(1)
@@ -145,10 +123,6 @@ class CPU:
             self.reg[reg_a] += self.reg[reg_b]
         #elif op == "SUB": etc
         elif op == "MUL":
-            # result = 0b00000010  
-            # for _ in range(self.reg[reg_b]):
-            #     self.reg[result] += self.reg[reg_a]
-            # self.reg[reg_a] = self.reg[result]
             self.reg[reg_a] *= self.reg[reg_b]
         else:
             raise Exception("Unsupported ALU operation")
@@ -217,25 +191,5 @@ class CPU:
             elif self.ram[self.ir] == RET:
                 self.cpu_ret()
                 
-
-
-        # this prints out 0
-
-        # run_cpu = True
-
-        # while run_cpu:
-
-        #     self.ir = self.pc
-        #     o1 = self.ram_read(self.pc + 1)
-        #     o2 = self.ram_read(self.pc + 2)
-
-        #     if self.ram[self.ir] == LDI:
-        #         self.reg[o1] == o2
-        #         self.pc += 3
-        #     elif self.ram[self.ir] == PRN:
-        #         print(self.reg[o1])
-        #         self.pc += 2
-        #     elif self.ram[self.ir] == self.h:
-        #         run_cpu = False
 
 
