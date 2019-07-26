@@ -84,6 +84,18 @@ class CPU:
         ret_add = self.ram[self.start]
         self.start += 1
         self.pc = ret_add
+    
+    def cpu_cmd(self):
+        pass
+    
+    def cpu_jmp(self):
+        pass
+    
+    def cpu_jeq(self):
+        pass
+    
+    def cpu_jne(self):
+        pass
 
     def ram_read(self, current):
         return self.ram[current]
