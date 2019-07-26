@@ -16,6 +16,8 @@ class CPU:
         self.ir = 0x00
         self.reg[7] = 0xf4
         self.start = self.reg[7]
+        #flag for conditionals
+        self.flag = 0
         #opcodes
         self.cpu_run = True
         self.h = 0b00000001 
@@ -27,6 +29,10 @@ class CPU:
         self.call = 0b01010000
         self.ret = 0b00010001
         self.add = 0b10100000
+        self.cmp = 0b10100111
+        self.jmp = 0b01010100
+        self.jeq = 0b01010101
+        self.jne = 0b01010110
         self.op_table = {}
         self.op_table[self.h] = self.cpu_halt
         self.op_table[self.ldi] = self.cpu_ldi
