@@ -200,7 +200,7 @@ class CPU:
         JNE = 0b01010110
 
         
-        self.trace()
+        # self.trace()
         run_cpu = True
 
         while run_cpu:
