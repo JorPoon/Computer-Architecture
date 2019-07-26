@@ -16,6 +16,8 @@ class CPU:
         self.ir = 0x00
         self.reg[7] = 0xf4
         self.start = self.reg[7]
+        #flag for conditionals
+        self.flag = 0b0000000
         #opcodes
         self.cpu_run = True
         self.h = 0b00000001 
@@ -27,16 +29,17 @@ class CPU:
         self.call = 0b01010000
         self.ret = 0b00010001
         self.add = 0b10100000
+        self.cmp = 0b10100111
+        self.jmp = 0b01010100
+        self.jeq = 0b01010101
+        self.jne = 0b01010110
         self.op_table = {}
         self.op_table[self.h] = self.cpu_halt
         self.op_table[self.ldi] = self.cpu_ldi
         self.op_table[self.prn] = self.cpu_prn
         self.op_table[self.mul] = self.cpu_mul
         self.op_table[self.push] = self.cpu_push
-
-
-        
-        
+ 
     def cpu_halt(self):
         self.cpu_run = False
         sys.exit(1)  
@@ -59,14 +62,14 @@ class CPU:
         reg_num = self.ram[self.pc + 1]
         value = self.reg[reg_num]
         self.ram[self.start] = value
-        # self.pc += 2
+        
     
     def cpu_pop(self):
         value = self.ram[self.start]
         reg_num = self.ram[self.pc + 1]
         self.reg[reg_num] = value
         self.start += 1
-        # self.pc += 2
+        
     
     def cpu_call(self):
         return_addr = self.pc + 2
@@ -81,6 +84,29 @@ class CPU:
         ret_add = self.ram[self.start]
         self.start += 1
         self.pc = ret_add
+    
+    def cpu_cmp(self):
+        pass
+    
+    def cpu_jmp(self):
+        reg_num = self.ram_read(self.pc + 1)
+        self.pc = self.reg[reg_num]
+    
+    def cpu_jeq(self):
+        if self.flag == 0b00000001:
+            reg_num = self.ram_read(self.pc + 1)
+            self.pc = self.reg[reg_num]
+        else:
+            self.pc += 2
+            
+    
+    def cpu_jne(self):
+        if self.flag != 0b00000001:
+            reg_num = self.ram_read(self.pc + 1)
+            self.pc = self.reg[reg_num]
+        else:
+            self.pc += 2
+
 
     def ram_read(self, current):
         return self.ram[current]
@@ -91,25 +117,6 @@ class CPU:
     def load(self):
         """Load a program into memory."""
 
-        # address = 0
-
-        # # For now, we've just hardcoded a program:
-
-        # program = [
-        #     # From print8.ls8
-        #     0b10000010, # LDI R0,8
-        #     0b00000000,
-        #     0b00001000,
-        #     0b01000111, # PRN R0
-        #     0b00000000,
-        #     0b00000001, # HLT
-        # ]
-
-        # for instruction in program:
-        #     self.ram[address] = instruction
-        #     address += 1
-        # print(sys.argv[0])
-        # print(sys.argv[1])
         if len(sys.argv) != 2:
             print(f"usage: {sys.argv[0]} filename")
             sys.exit(1)
@@ -139,11 +146,21 @@ class CPU:
             self.reg[reg_a] += self.reg[reg_b]
         #elif op == "SUB": etc
         elif op == "MUL":
-            # result = 0b00000010  
-            # for _ in range(self.reg[reg_b]):
-            #     self.reg[result] += self.reg[reg_a]
-            # self.reg[reg_a] = self.reg[result]
             self.reg[reg_a] *= self.reg[reg_b]
+        elif op == "CMP":
+            result = self.reg[reg_b] - self.reg[reg_a]
+            if result > 0:
+                #a is less than b
+                self.flag = 0b00000100
+            elif result < 0:
+                #a is more than b
+                self.flag = 0b00000010
+                pass
+            elif result == 0:
+                #a is equal b
+                self.flag = 0b00000001
+            else:
+                self.flag = 0b00000000
         else:
             raise Exception("Unsupported ALU operation")
 
@@ -177,6 +194,11 @@ class CPU:
         CALL = 0b01010000
         RET = 0b00010001
         ADD = 0b10100000
+        CMP = 0b10100111
+        JMP = 0b01010100
+        JEQ = 0b01010101
+        JNE = 0b01010110
+
         
         # self.trace()
         run_cpu = True
@@ -210,26 +232,15 @@ class CPU:
                 self.cpu_call()
             elif self.ram[self.ir] == RET:
                 self.cpu_ret()
+            elif self.ram[self.ir] == CMP:
+                self.alu("CMP", o1, o2)
+                self.pc += 3
+            elif self.ram[self.ir] == JMP:
+                self.cpu_jmp()   
+            elif self.ram[self.ir] == JEQ:
+                self.cpu_jeq()   
+            elif self.ram[self.ir] == JNE:
+                self.cpu_jne()
                 
-
-
-        # this prints out 0
-
-        # run_cpu = True
-
-        # while run_cpu:
-
-        #     self.ir = self.pc
-        #     o1 = self.ram_read(self.pc + 1)
-        #     o2 = self.ram_read(self.pc + 2)
-
-        #     if self.ram[self.ir] == LDI:
-        #         self.reg[o1] == o2
-        #         self.pc += 3
-        #     elif self.ram[self.ir] == PRN:
-        #         print(self.reg[o1])
-        #         self.pc += 2
-        #     elif self.ram[self.ir] == self.h:
-        #         run_cpu = False
 
 
