@@ -62,14 +62,14 @@ class CPU:
         reg_num = self.ram[self.pc + 1]
         value = self.reg[reg_num]
         self.ram[self.start] = value
-        # self.pc += 2
+        
     
     def cpu_pop(self):
         value = self.ram[self.start]
         reg_num = self.ram[self.pc + 1]
         self.reg[reg_num] = value
         self.start += 1
-        # self.pc += 2
+        
     
     def cpu_call(self):
         return_addr = self.pc + 2
