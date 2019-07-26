@@ -85,17 +85,28 @@ class CPU:
         self.start += 1
         self.pc = ret_add
     
-    def cpu_cmd(self):
+    def cpu_cmp(self):
         pass
     
     def cpu_jmp(self):
-        self.pc = self.ram_read(self.pc + 1)
+        reg_num = self.ram_read(self.pc + 1)
+        self.pc = self.reg[reg_num]
     
     def cpu_jeq(self):
-        pass
+        if self.flag == 0b00000001:
+            reg_num = self.ram_read(self.pc + 1)
+            self.pc = self.reg[reg_num]
+        else:
+            self.pc += 2
+            
     
     def cpu_jne(self):
-        pass
+        if self.flag != 0b00000001:
+            reg_num = self.ram_read(self.pc + 1)
+            self.pc = self.reg[reg_num]
+        else:
+            self.pc += 2
+
 
     def ram_read(self, current):
         return self.ram[current]
@@ -136,6 +147,20 @@ class CPU:
         #elif op == "SUB": etc
         elif op == "MUL":
             self.reg[reg_a] *= self.reg[reg_b]
+        elif op == "CMP":
+            result = self.reg[reg_b] - self.reg[reg_a]
+            if result > 0:
+                #a is less than b
+                self.flag = 0b00000100
+            elif result < 0:
+                #a is more than b
+                self.flag = 0b00000010
+                pass
+            elif result == 0:
+                #a is equal b
+                self.flag = 0b00000001
+            else:
+                self.flag = 0b00000000
         else:
             raise Exception("Unsupported ALU operation")
 
@@ -175,7 +200,7 @@ class CPU:
         JNE = 0b01010110
 
         
-        # self.trace()
+        self.trace()
         run_cpu = True
 
         while run_cpu:
@@ -208,11 +233,12 @@ class CPU:
             elif self.ram[self.ir] == RET:
                 self.cpu_ret()
             elif self.ram[self.ir] == CMP:
-                self.cpu_cmd()
+                self.alu("CMP", o1, o2)
+                self.pc += 3
             elif self.ram[self.ir] == JMP:
-                self.cpu_jmp()
+                self.cpu_jmp()   
             elif self.ram[self.ir] == JEQ:
-                self.cpu_jeq()
+                self.cpu_jeq()   
             elif self.ram[self.ir] == JNE:
                 self.cpu_jne()
                 
